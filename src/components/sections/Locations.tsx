@@ -1,7 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Globe from "@/components/effects/Globe";
+import dynamic from "next/dynamic";
+
+const Globe = dynamic(() => import("@/components/effects/Globe"), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="w-full h-full flex items-center justify-center"
+      style={{ background: "#0a0a0d" }}
+    >
+      <span className="text-amber text-eyebrow animate-pulse">
+        [LOADING_GLOBE...]
+      </span>
+    </div>
+  ),
+});
 
 const LOCATIONS = [
   {
@@ -63,7 +77,7 @@ export default function Locations() {
           observer.unobserve(node);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     );
 
     observer.observe(node);
@@ -76,20 +90,34 @@ export default function Locations() {
       ref={sectionRef}
       className="bg-surface border-brutal-thick-t border-brutal-thick-b relative overflow-hidden"
     >
-      <div className="relative h-[60vh] -mt-12 -mb-16">
+      {/* ── Globe container ── */}
+      <div className="relative h-[500px] md:h-[650px] w-full">
         <Globe className="absolute inset-0" />
+
+        {/* Top gradient mask */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+          className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10"
           style={{
-            background: "linear-gradient(to bottom, transparent, #141418)",
+            background:
+              "linear-gradient(to bottom, #0a0a0d, transparent)",
+          }}
+        />
+
+        {/* Bottom gradient mask */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10"
+          style={{
+            background:
+              "linear-gradient(to top, #141418, transparent)",
           }}
         />
       </div>
 
+      {/* ── Body ── */}
       <div className="mx-auto max-w-7xl px-6 pb-24 relative z-10">
         <div className="mb-16">
           <span className="text-eyebrow text-amber block mb-4">
-            <span className="text-amber">{">"}</span> GLOBAL NODES
+            <span className="text-amber">&gt;</span> GLOBAL NODES
           </span>
           <h2 className="text-subheading">
             NETWORK<span className="text-amber">_</span>TOPOLOGY
@@ -125,7 +153,9 @@ export default function Locations() {
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? "translateY(0)" : "translateY(20px)",
-                transition: `opacity 0.5s ease-out ${i * 150}ms, transform 0.5s ease-out ${i * 150}ms`,
+                transition: `opacity 0.5s ease-out ${
+                  i * 150
+                }ms, transform 0.5s ease-out ${i * 150}ms`,
               }}
             >
               <div className="flex items-center justify-between mb-4">
