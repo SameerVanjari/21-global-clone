@@ -1,7 +1,15 @@
-"use client";
-
-import Globe from "@/components/effects/Globe";
+import dynamic from "next/dynamic";
 import ScrollReveal from "@/components/effects/ScrollReveal";
+
+const Globe = dynamic(() => import("@/components/effects/Globe"), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="w-full h-full"
+      style={{ backgroundColor: "#f5f2ed" }}
+    />
+  ),
+});
 
 const LOCATIONS = [
   {
@@ -28,62 +36,81 @@ export default function Locations() {
   return (
     <section
       id="locations"
-      className="relative min-h-screen flex flex-col overflow-hidden"
+      className="relative overflow-hidden"
       style={{ backgroundColor: "#f5f2ed" }}
     >
-      {/* Globe container */}
+      {/* Section header — monumental, ultra-thin */}
+      <div className="relative z-10 pt-32 md:pt-40 pb-12 md:pb-16 px-8 md:px-16">
+        <p className="font-manrope text-[clamp(2.5rem,6vw,5rem)] font-extralight tracking-[-0.02em] leading-[0.95] text-[#1a1a1a]">
+          Global
+          <br />
+          Presence
+        </p>
+        <p className="mt-6 text-sm font-light tracking-[0.15em] uppercase text-[#1a1a1a]/30 max-w-md">
+          Three desks. One unbroken chain of trust.
+        </p>
+      </div>
+
+      {/* Globe container — tall, imposing, with gradient masks */}
       <div
-        className="relative w-full flex-shrink-0"
+        className="relative w-full h-[550px] md:h-[700px]"
         style={{
-          height: "55vh",
-          boxShadow:
-            "0 80px 120px -40px rgba(0,0,0,0.3), 0 32px 64px -20px rgba(0,0,0,0.15)",
+          boxShadow: "0 60px 120px -30px rgba(0,0,0,0.25)",
         }}
       >
+        {/* Top gradient mask — limestone to transparent */}
+        <div
+          className="absolute top-0 left-0 right-0 z-10 pointer-events-none h-40"
+          style={{
+            background:
+              "linear-gradient(to bottom, #f5f2ed 0%, rgba(245,242,237,0.8) 30%, transparent 100%)",
+          }}
+        />
+
+        {/* Bottom gradient mask — transparent to limestone */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none h-40"
+          style={{
+            background:
+              "linear-gradient(to top, #f5f2ed 0%, rgba(245,242,237,0.8) 30%, transparent 100%)",
+          }}
+        />
+
         <Globe />
       </div>
 
-      {/* Gradient mask — subtle blend from globe shadow to below content */}
-      <div
-        className="relative z-10 pointer-events-none"
-        style={{
-          height: "80px",
-          background:
-            "linear-gradient(to bottom, rgba(245,242,237,0.85) 0%, rgba(245,242,237,0.5) 40%, rgba(245,242,237,0) 100%)",
-          marginTop: "-80px",
-        }}
-      />
-
-      {/* City cards */}
-      <div className="relative z-20 w-full max-w-[1600px] mx-auto px-8 md:px-16 pb-24 md:pb-32">
-        <ScrollReveal>
-          <p className="text-xs font-light tracking-[0.4em] uppercase text-[#1a1a1a]/30 mb-16">
-            Global Presence
-          </p>
-        </ScrollReveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+      {/* City cards — stone/concrete block feel */}
+      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-8 md:px-16 pt-16 md:pt-24 pb-24 md:pb-32">
+        <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-0"
+          style={{
+            boxShadow:
+              "0 40px 80px -20px rgba(0,0,0,0.12), 0 4px 16px -4px rgba(0,0,0,0.06)",
+          }}
+        >
           {LOCATIONS.map((loc, i) => (
             <ScrollReveal key={loc.city} delay={i * 200}>
               <div
-                className="py-12 md:py-16 md:pr-12"
+                className="py-14 md:py-20 px-8 md:px-12 h-full"
                 style={{
+                  backgroundColor: "#f5f2ed",
                   boxShadow:
                     i !== LOCATIONS.length - 1
-                      ? "inset -1px 0 0 0 rgba(26,26,26,0.06)"
+                      ? "inset -1px 0 0 0 rgba(26,26,26,0.07)"
                       : "none",
                 }}
               >
-                <p className="text-xs font-light tracking-[0.25em] uppercase text-[#1a1a1a]/40 mb-3">
+                <p className="text-xs font-light tracking-[0.3em] uppercase text-[#1a1a1a]/35 mb-4">
                   {loc.region}
                 </p>
-                <h3 className="text-xl md:text-2xl font-extralight tracking-[0.1em] uppercase text-[#1a1a1a] mb-1">
+                <h3 className="text-xl md:text-2xl font-light tracking-[0.12em] uppercase text-[#1a1a1a] mb-1">
                   {loc.city}
                 </h3>
-                <p className="text-xs font-light tracking-[0.15em] uppercase text-[#1a1a1a]/30 mb-6">
+                <p className="text-xs font-light tracking-[0.18em] uppercase text-[#1a1a1a]/25 mb-7">
                   {loc.country}
                 </p>
-                <p className="text-sm font-light leading-relaxed text-[#1a1a1a]/50 max-w-xs">
+                <div className="w-8 h-px mb-7" style={{ backgroundColor: "rgba(26,26,26,0.1)" }} />
+                <p className="text-sm font-light leading-relaxed text-[#1a1a1a]/45 max-w-xs">
                   {loc.desc}
                 </p>
               </div>
@@ -91,17 +118,6 @@ export default function Locations() {
           ))}
         </div>
       </div>
-
-      {/* Deep shadow at bottom of cards */}
-      <div
-        className="relative z-30 w-full pointer-events-none"
-        style={{
-          height: "120px",
-          boxShadow:
-            "0 -4px 8px rgba(10,10,10,0.04), 0 -16px 32px rgba(10,10,10,0.06), 0 -48px 96px rgba(10,10,10,0.08)",
-          marginTop: "-16px",
-        }}
-      />
     </section>
   );
 }
