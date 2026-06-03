@@ -1,6 +1,7 @@
 "use client";
 
 import ScrollReveal from "@/components/effects/ScrollReveal";
+import Globe from "@/components/effects/Globe";
 import { MapPin } from "lucide-react";
 
 const locations = [
@@ -32,12 +33,12 @@ const locations = [
 
 export default function Locations() {
   return (
-    <section id="locations" className="relative py-24 lg:py-32 scroll-section">
+    <section id="locations" className="relative py-24 lg:py-32 scroll-section overflow-hidden">
       <div className="absolute inset-0 bg-surface" />
 
-      {/* Section header */}
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-20">
+        {/* Section header */}
+        <div className="text-center mb-12">
           <ScrollReveal sparkle>
             <p className="text-gold-300/60 text-xs tracking-[0.4em] uppercase mb-4 font-light">
               Global Presence
@@ -57,10 +58,46 @@ export default function Locations() {
           </ScrollReveal>
         </div>
 
+        {/* Globe area */}
+        <ScrollReveal delay={0.3}>
+          <div className="relative w-full mb-16">
+            <div className="relative w-full h-[380px] sm:h-[420px] lg:h-[480px] overflow-hidden">
+              {/* Gold gradient mask at bottom */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10"
+                style={{
+                  background: "linear-gradient(to bottom, transparent 0%, #131620 100%)",
+                }}
+              />
+              {/* Gold gradient mask at top (subtle) */}
+              <div
+                className="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10"
+                style={{
+                  background: "linear-gradient(to top, transparent 0%, rgba(19, 22, 32, 0.6) 100%)",
+                }}
+              />
+              <Globe />
+            </div>
+
+            {/* Decorative diamond border ring around globe area */}
+            <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-[70%] bg-gradient-to-b from-transparent via-gold-300/10 to-transparent" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-[60%] bg-gradient-to-r from-transparent via-gold-300/10 to-transparent" />
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* Geometric divider */}
+        <ScrollReveal delay={0.4}>
+          <div className="max-w-xl mx-auto mb-16">
+            <div className="ornate-divider" />
+          </div>
+        </ScrollReveal>
+
         {/* Three-column symmetrical layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-1 bg-gold-300/5 max-w-5xl mx-auto">
           {locations.map((loc, i) => (
-            <ScrollReveal key={loc.city} delay={0.15 * i} direction="up">
+            <ScrollReveal key={loc.city} delay={0.5 + 0.15 * i} direction="up">
               <div className="group relative bg-surface p-8 lg:p-10 transition-all duration-500 hover:bg-navy-50/30">
                 {/* Top gold accent */}
                 <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-gold-300/30 to-transparent group-hover:via-gold-300/60 transition-all duration-500" />
