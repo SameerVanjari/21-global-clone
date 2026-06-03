@@ -1,278 +1,366 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef, useMemo, Suspense } from "react";
+import * as THREE from "three";
+import { Canvas, useFrame } from "@react-three/fiber";
 
-const GLOBE_RADIUS = 160;
-const TILT = 12 * (Math.PI / 180);
-const BASE_SPEED = 0.00012;
-const CITY_MARKERS = [
+const GLOBE_RADIUS = 1.04;
+const ATMOSPHERE_RADIUS = 1.14;
+
+const CITIES: { name: string; lat: number; lng: number }[] = [
   { name: "Dubai", lat: 25.2, lng: 55.3 },
   { name: "Singapore", lat: 1.35, lng: 103.8 },
   { name: "Geneva", lat: 46.2, lng: 6.15 },
 ];
 
-const CONTINENTS: { latMin: number; latMax: number; lngMin: number; lngMax: number }[] = [
-  { latMin: 15, latMax: 72, lngMin: -170, lngMax: -50 },
-  { latMin: -56, latMax: 12, lngMin: -80, lngMax: -34 },
-  { latMin: 35, latMax: 71, lngMin: -10, lngMax: 40 },
-  { latMin: -35, latMax: 37, lngMin: -18, lngMax: 52 },
-  { latMin: 5, latMax: 72, lngMin: 40, lngMax: 180 },
-  { latMin: -39, latMax: -10, lngMin: 113, lngMax: 155 },
-  { latMin: 12, latMax: 40, lngMin: 30, lngMax: 60 },
-];
-
-function isLand(lat: number, lng: number): boolean {
-  for (const c of CONTINENTS) {
-    if (lat >= c.latMin && lat <= c.latMax && lng >= c.lngMin && lng <= c.lngMax) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function latLngToVec3(lat: number, lng: number): [number, number, number] {
+function latLngToVec3(
+  lat: number,
+  lng: number,
+  radius: number,
+): THREE.Vector3 {
   const phi = (90 - lat) * (Math.PI / 180);
-  const theta = lng * (Math.PI / 180);
-  return [
-    Math.sin(phi) * Math.cos(theta),
-    Math.cos(phi),
-    Math.sin(phi) * Math.sin(theta),
-  ];
-}
-
-function rotateY(x: number, y: number, z: number, angle: number): [number, number, number] {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  return [x * cos + z * sin, y, -x * sin + z * cos];
-}
-
-function rotateX(x: number, y: number, z: number, angle: number): [number, number, number] {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  return [x, y * cos - z * sin, y * sin + z * cos];
-}
-
-function organicRadius(angle: number, time: number, baseRadius: number): number {
-  const noise =
-    Math.sin(angle * 3 + time * 0.3) * 1.5 +
-    Math.cos(angle * 5 - time * 0.2) * 1.2 +
-    Math.sin(angle * 7 + time * 0.4) * 0.8;
-  return baseRadius + noise;
-}
-
-function drawLeafMarker(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  r: number,
-  pulse: number,
-  color: string
-) {
-  const size = r * 1.6 * pulse;
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(-Math.PI / 4);
-  ctx.beginPath();
-  ctx.moveTo(0, -size);
-  ctx.bezierCurveTo(size * 0.8, -size * 0.6, size * 0.8, size * 0.2, 0, size);
-  ctx.bezierCurveTo(-size * 0.8, size * 0.2, -size * 0.8, -size * 0.6, 0, -size);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.restore();
-}
-
-function project(lat: number, lng: number, rot: number) {
-  const [vx, vy, vz] = latLngToVec3(lat, lng);
-  const [rx, ry, rz] = rotateY(vx, vy, vz, rot);
-  const [tx, ty, tz] = rotateX(rx, ry, rz, TILT);
-  return { x: tx, y: ty, z: tz };
-}
-
-function drawGlobeFill(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number
-) {
-  const grad = ctx.createRadialGradient(
-    cx - GLOBE_RADIUS * 0.25,
-    cy - GLOBE_RADIUS * 0.3,
-    GLOBE_RADIUS * 0.1,
-    cx,
-    cy,
-    GLOBE_RADIUS
+  const theta = (lng + 180) * (Math.PI / 180);
+  return new THREE.Vector3(
+    -Math.sin(phi) * Math.cos(theta) * radius,
+    Math.cos(phi) * radius,
+    Math.sin(phi) * Math.sin(theta) * radius,
   );
-  grad.addColorStop(0, "rgba(253, 248, 240, 0.95)");
-  grad.addColorStop(0.5, "rgba(252, 243, 230, 0.9)");
-  grad.addColorStop(0.85, "rgba(242, 228, 210, 0.7)");
-  grad.addColorStop(1, "rgba(232, 213, 196, 0.4)");
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, GLOBE_RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = grad;
-  ctx.fill();
 }
 
-function drawLatitudeLines(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  time: number,
-  rot: number,
-  dpr: number
-) {
-  for (let lat = -60; lat <= 60; lat += 15) {
-    const points: [number, number][] = [];
-    for (let lng = 0; lng <= 360; lng += 3) {
-      const { x, y, z } = project(lat, lng, rot);
-      if (z > 0) {
-        points.push([cx + x * GLOBE_RADIUS, cy - y * GLOBE_RADIUS]);
-      }
-    }
+function generateOrganicDots(radius: number) {
+  const sageArr: number[] = [];
+  const terraArr: number[] = [];
+  const n = 2600;
+  const gr = (1 + Math.sqrt(5)) / 2;
 
-    if (points.length > 2) {
-      ctx.beginPath();
-      ctx.moveTo(points[0][0], points[0][1]);
-      for (let i = 1; i < points.length; i++) {
-        const px = points[i][0];
-        const py = points[i][1];
-        const wave = Math.sin(px * 0.05 + time * 0.5 + lat * 0.3) * 1.0;
-        ctx.lineTo(px, py + wave);
-      }
-      ctx.strokeStyle = `rgba(125, 155, 118, 0.12)`;
-      ctx.lineWidth = 0.5 * dpr;
-      ctx.stroke();
+  for (let i = 0; i < n; i++) {
+    const theta = 2 * Math.PI * ((i / gr) % 1);
+    const phi = Math.acos(1 - (2 * (i + 0.5)) / n);
+
+    const nx = Math.sin(phi * 6.3) * Math.cos(theta * 4.7) * 0.055;
+    const ny = Math.cos(phi * 4.1) * Math.sin(theta * 5.3) * 0.05;
+    const nz = Math.cos(theta * 6.7) * Math.sin(phi * 3.2) * 0.055;
+
+    const x = (Math.cos(theta) * Math.sin(phi) + nx) * radius;
+    const y = (Math.cos(phi) + ny) * radius;
+    const z = (Math.sin(theta) * Math.sin(phi) + nz) * radius;
+
+    if (Math.random() < 0.13) {
+      terraArr.push(x, y, z);
+    } else {
+      sageArr.push(x, y, z);
     }
   }
+
+  return {
+    sage: new Float32Array(sageArr),
+    terracotta: new Float32Array(terraArr),
+  };
 }
 
-function drawGlobeOutline(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  time: number,
-  dpr: number
-) {
-  const steps = 100;
-  ctx.beginPath();
-  for (let i = 0; i <= steps; i++) {
-    const angle = (i / steps) * Math.PI * 2;
-    const r = organicRadius(angle, time, GLOBE_RADIUS);
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * r;
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.closePath();
-  ctx.strokeStyle = `rgba(194, 105, 65, 0.18)`;
-  ctx.lineWidth = 1.2 * dpr;
-  ctx.stroke();
+function TeardropMarker({ position }: { position: THREE.Vector3 }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  const teardropGeo = useMemo(() => {
+    const pts: THREE.Vector2[] = [];
+    const segs = 24;
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs;
+      const y = 0.14 - t * 0.3;
+      let r: number;
+      if (t < 0.18) {
+        r = 0.032 * Math.sin((t / 0.18) * Math.PI * 0.5);
+      } else if (t < 0.6) {
+        r = 0.032 + 0.028 * Math.sin(((t - 0.18) / 0.42) * Math.PI);
+      } else {
+        r = (0.032 + 0.028) * Math.max(0, 1 - (t - 0.6) / 0.4);
+      }
+      const rr = Math.max(r, 0.003);
+      pts.push(new THREE.Vector2(rr, y));
+    }
+    return new THREE.LatheGeometry(pts, 10);
+  }, []);
+
+  const dir = position.clone().normalize();
+  const quat = new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    dir,
+  );
+
+  useFrame(() => {
+    if (groupRef.current) {
+      const t = performance.now() * 0.001;
+      const breathe = 1 + Math.sin(t * 2.094) * 0.16;
+      groupRef.current.scale.setScalar(breathe);
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={position} quaternion={quat}>
+      <mesh geometry={teardropGeo}>
+        <meshStandardMaterial
+          color="#c26941"
+          roughness={0.25}
+          metalness={0.05}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function PulseDot({
+  curve,
+  offset,
+  color,
+}: {
+  curve: THREE.QuadraticBezierCurve3;
+  offset: number;
+  color: string;
+}) {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    const t = performance.now() * 0.001;
+    const speed = 0.1 + Math.sin(t * 0.3) * 0.03;
+    const pt = (t * speed + offset) % 1;
+    const pos = curve.getPoint(pt);
+    meshRef.current.position.copy(pos);
+    const alpha = Math.sin(pt * Math.PI) * 0.55 + 0.08;
+    const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = alpha;
+  });
+
+  return <primitive ref={meshRef} object={pulseDotObj(color)} />;
+}
+
+const pulseGeo = new THREE.SphereGeometry(0.008, 6, 6);
+function pulseDotObj(color: string): THREE.Mesh {
+  const mat = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.3,
+  });
+  return new THREE.Mesh(pulseGeo, mat);
+}
+
+interface ArcData {
+  curve: THREE.QuadraticBezierCurve3;
+  lineGeo: THREE.BufferGeometry;
+  color: string;
+  index: number;
+}
+
+function Arc({ data }: { data: ArcData }) {
+  const lineRef = useRef<THREE.Line>(null);
+
+  const pulseOffsets: number[] = [0, 0.35, 0.68];
+
+  const lineObj = useMemo(() => {
+    const mat = new THREE.LineBasicMaterial({
+      color: data.color,
+      transparent: true,
+      opacity: 0.18,
+    });
+    return new THREE.Line(data.lineGeo, mat);
+  }, [data.lineGeo, data.color]);
+
+  useFrame(() => {
+    if (lineRef.current) {
+      const t = performance.now() * 0.001;
+      const alpha = 0.1 + Math.sin(t * 0.45 + data.index) * 0.07;
+      (lineRef.current.material as THREE.LineBasicMaterial).opacity = alpha;
+    }
+  });
+
+  return (
+    <group>
+      <primitive ref={lineRef} object={lineObj} />
+      {pulseOffsets.map((off, pi) => (
+        <PulseDot
+          key={pi}
+          curve={data.curve}
+          offset={off}
+          color={data.color}
+        />
+      ))}
+    </group>
+  );
+}
+
+function GlobeScene() {
+  const globeGroupRef = useRef<THREE.Group>(null);
+  const atmosRef = useRef<THREE.Mesh>(null);
+
+  const dotData = useMemo(
+    () => generateOrganicDots(GLOBE_RADIUS),
+    [],
+  );
+
+  const sageGeo = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(dotData.sage, 3),
+    );
+    return geo;
+  }, [dotData.sage]);
+
+  const terracottaGeo = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(dotData.terracotta, 3),
+    );
+    return geo;
+  }, [dotData.terracotta]);
+
+  const cityPositions = useMemo(
+    () =>
+      CITIES.map((c) =>
+        latLngToVec3(c.lat, c.lng, GLOBE_RADIUS),
+      ),
+    [],
+  );
+
+  const arcs: ArcData[] = useMemo(() => {
+    const pairs: [number, number][] = [
+      [0, 1],
+      [1, 2],
+      [2, 0],
+      [0, 1],
+      [1, 2],
+      [0, 2],
+    ];
+    const colors = [
+      "#7d9b76",
+      "#7d9b76",
+      "#c26941",
+      "#5a7a53",
+      "#c26941",
+      "#7d9b76",
+    ];
+
+    return pairs.map(([i, j], idx) => {
+      const start = cityPositions[i]!.clone();
+      const end = cityPositions[j]!.clone();
+      const mid = new THREE.Vector3()
+        .addVectors(start, end)
+        .multiplyScalar(0.5);
+      const dist = start.distanceTo(end);
+      const height =
+        0.22 + Math.sin(idx * 1.4) * 0.16 + Math.cos(idx * 2.1) * 0.1;
+      mid.normalize().multiplyScalar(GLOBE_RADIUS + dist * height);
+
+      const curve = new THREE.QuadraticBezierCurve3(
+        start,
+        mid,
+        end,
+      );
+      const pts = curve.getPoints(80);
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+
+      return { curve, lineGeo, color: colors[idx]!, index: idx };
+    });
+  }, [cityPositions]);
+
+  useFrame((_, delta) => {
+    if (globeGroupRef.current) {
+      const t = performance.now() * 0.001;
+      const speed =
+        0.08 + Math.sin(t * 0.35) * 0.028 + Math.cos(t * 0.52) * 0.018;
+      globeGroupRef.current.rotation.y += speed * delta;
+    }
+    if (atmosRef.current) {
+      const t = performance.now() * 0.001;
+      const breathe = 1 + Math.sin(t * 0.4) * 0.006;
+      atmosRef.current.scale.setScalar(breathe);
+      (atmosRef.current.material as THREE.MeshBasicMaterial).opacity =
+        0.035 + Math.sin(t * 0.3) * 0.007;
+    }
+  });
+
+  return (
+    <>
+      <ambientLight intensity={1.8} color="#fdf8f0" />
+      <directionalLight position={[5, 5, 5]} intensity={0.7} color="#ffffff" />
+      <directionalLight
+        position={[-3, -2, -3]}
+        intensity={0.35}
+        color="#f5ede0"
+      />
+
+      <group ref={globeGroupRef}>
+        <mesh>
+          <sphereGeometry args={[GLOBE_RADIUS, 72, 72]} />
+          <meshStandardMaterial
+            color="#f5ede0"
+            roughness={0.45}
+            metalness={0.03}
+          />
+        </mesh>
+
+        <mesh>
+          <sphereGeometry args={[GLOBE_RADIUS * 0.985, 64, 64]} />
+          <meshBasicMaterial
+            color="#fdf8f0"
+            transparent
+            opacity={0.12}
+          />
+        </mesh>
+
+        <points geometry={sageGeo}>
+          <pointsMaterial
+            color="#7d9b76"
+            size={0.014}
+            sizeAttenuation
+            transparent
+            opacity={0.7}
+          />
+        </points>
+
+        <points geometry={terracottaGeo}>
+          <pointsMaterial
+            color="#c26941"
+            size={0.016}
+            sizeAttenuation
+            transparent
+            opacity={0.5}
+          />
+        </points>
+
+        {cityPositions.map((pos, i) => (
+          <TeardropMarker key={i} position={pos} />
+        ))}
+
+        {arcs.map((arc) => (
+          <Arc key={arc.index} data={arc} />
+        ))}
+      </group>
+
+      <mesh ref={atmosRef}>
+        <sphereGeometry args={[ATMOSPHERE_RADIUS, 64, 64]} />
+        <meshBasicMaterial
+          color="#fdf8f0"
+          transparent
+          opacity={0.04}
+          side={THREE.FrontSide}
+        />
+      </mesh>
+    </>
+  );
 }
 
 export default function Globe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    let w = 0;
-    let h = 0;
-
-    function updateSize() {
-      const c = canvasRef.current;
-      if (!c) return;
-      const rect = c.getBoundingClientRect();
-      w = Math.floor(rect.width * dpr);
-      h = Math.floor(rect.height * dpr);
-      c.width = w;
-      c.height = h;
-    }
-
-    updateSize();
-
-    let animId: number;
-    let rotation = 0;
-    let lastTime = performance.now();
-
-    const landDots: [number, number][] = [];
-    for (let lat = -75; lat <= 75; lat += 3) {
-      for (let lng = -175; lng <= 175; lng += 3) {
-        if (isLand(lat, lng)) {
-          landDots.push([lat, lng]);
-        }
-      }
-    }
-
-    function animate(now: number) {
-      const cx = w / 2;
-      const cy = h / 2;
-      const dt = Math.min(now - lastTime, 50);
-      lastTime = now;
-      const c = ctx!;
-
-      const wobble = 1 + Math.sin(now * 0.00008) * 0.08 + Math.sin(now * 0.00015) * 0.05;
-      rotation += BASE_SPEED * wobble * dt;
-
-      c.clearRect(0, 0, w, h);
-
-      drawGlobeFill(c, cx, cy);
-
-      for (const [lat, lng] of landDots) {
-        const { x, y, z } = project(lat, lng, rotation);
-        if (z <= 0) continue;
-        const px = cx + x * GLOBE_RADIUS;
-        const py = cy - y * GLOBE_RADIUS;
-
-        const distFromCenter = Math.sqrt(x * x + y * y);
-        const edgeFade = 1 - Math.min(1, distFromCenter / 0.95);
-        const opacity = (0.18 + 0.32 * (1 - Math.abs(lat / 75))) * edgeFade;
-
-        c.beginPath();
-        c.arc(px, py, 1.6 * dpr * (0.8 + 0.2 * edgeFade), 0, Math.PI * 2);
-        c.fillStyle = `rgba(125, 155, 118, ${opacity.toFixed(2)})`;
-        c.fill();
-      }
-
-      drawLatitudeLines(c, cx, cy, now * 0.001, rotation, dpr);
-      drawGlobeOutline(c, cx, cy, now * 0.001, dpr);
-
-      for (const city of CITY_MARKERS) {
-        const { x, y, z } = project(city.lat, city.lng, rotation);
-        if (z <= 0) continue;
-        const px = cx + x * GLOBE_RADIUS;
-        const py = cy - y * GLOBE_RADIUS;
-
-        const pulse = 1 + Math.sin(now * 0.003) * 0.15;
-        drawLeafMarker(c, px, py, 6 * dpr, pulse, "#c26941");
-
-        c.beginPath();
-        c.arc(px, py, 8 * dpr * pulse * 0.3, 0, Math.PI * 2);
-        c.fillStyle = `rgba(194, 105, 65, ${(0.15 * pulse).toFixed(2)})`;
-        c.fill();
-      }
-
-      animId = requestAnimationFrame(animate);
-    }
-
-    animId = requestAnimationFrame(animate);
-
-    const resizeHandler = () => updateSize();
-    window.addEventListener("resize", resizeHandler);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resizeHandler);
-    };
-  }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute left-1/2 top-0 h-full w-[480px] max-w-full -translate-x-1/2"
-      aria-hidden="true"
-    />
+    <Canvas
+      camera={{ position: [0, 0, 2.5], fov: 45 }}
+      gl={{ alpha: true, antialias: true, preserveDrawingBuffer: false }}
+      style={{ width: "100%", height: "100%" }}
+    >
+      <Suspense fallback={null}>
+        <GlobeScene />
+      </Suspense>
+    </Canvas>
   );
 }

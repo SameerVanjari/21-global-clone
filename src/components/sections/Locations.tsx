@@ -1,9 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import ScrollReveal from "@/components/effects/ScrollReveal";
-import Globe from "@/components/effects/Globe";
 import { cn } from "@/lib/utils";
+
+const Globe = dynamic(() => import("@/components/effects/Globe"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center">
+      <div
+        className="h-32 w-32 animate-spin rounded-full border-4 border-transparent"
+        style={{
+          borderTopColor: "#c26941",
+          borderRightColor: "#7d9b76",
+          borderRadius: "45% 55% 55% 45% / 48% 52% 48% 52%",
+        }}
+      />
+    </div>
+  ),
+});
 
 const locations = [
   {
@@ -38,72 +53,24 @@ const locations = [
   },
 ];
 
-const particles = Array.from({ length: 20 }, (_, i) => ({
+const particles = Array.from({ length: 22 }, (_, i) => ({
   id: i,
   size: 2 + Math.random() * 5,
-  left: `${15 + Math.random() * 70}%`,
-  top: `${10 + Math.random() * 55}%`,
-  duration: 10 + Math.random() * 20,
-  delay: Math.random() * 15,
+  left: `${8 + Math.random() * 84}%`,
+  top: `${8 + Math.random() * 60}%`,
+  duration: 12 + Math.random() * 22,
+  delay: Math.random() * 18,
   type: Math.random() > 0.5 ? "particle" : "diagonal",
 }));
 
 export default function Locations() {
-  const sectionRef = useRef<HTMLElement>(null);
-
   return (
     <section
-      ref={sectionRef}
       id="locations"
       className="relative overflow-hidden bg-cream pt-0 pb-24 lg:pb-32"
     >
-      {/* Globe area */}
-      <div className="relative h-[380px] sm:h-[440px] overflow-hidden">
-        {/* Floating particles around globe */}
-        <div className="pointer-events-none absolute inset-0">
-          {particles.map((p) => (
-            <div
-              key={p.id}
-              className={
-                p.type === "particle"
-                  ? "animate-float-particle absolute rounded-full bg-terracotta"
-                  : "animate-float-diagonal absolute rounded-full bg-sage"
-              }
-              style={{
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                left: p.left,
-                top: p.top,
-                animationDuration: `${p.duration}s`,
-                animationDelay: `${p.delay}s`,
-                opacity: 0.12 + Math.random() * 0.18,
-                borderRadius:
-                  p.size > 4 ? "50% 50% 45% 55% / 48% 52% 50% 50%" : "50%",
-              }}
-            />
-          ))}
-        </div>
-
-        <Globe />
-
-        {/* Organic gradient mask at bottom of globe area */}
-        <div
-          className="absolute bottom-0 left-0 right-0 z-10 h-40"
-          style={{
-            background: `linear-gradient(
-              to bottom,
-              transparent 0%,
-              rgba(253, 248, 240, 0.4) 25%,
-              rgba(253, 248, 240, 0.8) 55%,
-              #fdf8f0 85%
-            )`,
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 75% 90%, 50% 100%, 25% 88%, 0 100%)",
-          }}
-        />
-      </div>
-
-      {/* Content below globe */}
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-12 -mt-10">
+      {/* Section header */}
+      <div className="mx-auto max-w-7xl px-6 lg:px-12 pt-24 lg:pt-32">
         <ScrollReveal>
           <p className="mb-3 font-[family-name:var(--font-body)] text-sm font-medium tracking-widest text-terracotta uppercase">
             Global Presence
@@ -119,8 +86,68 @@ export default function Locations() {
             continuous ring of expertise that never sleeps.
           </p>
         </ScrollReveal>
+      </div>
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+      {/* Globe container */}
+      <div className="relative mt-12 h-[500px] w-full md:h-[650px]">
+        {/* Floating particles */}
+        <div className="pointer-events-none absolute inset-0 z-10">
+          {particles.map((p) => (
+            <div
+              key={p.id}
+              className={
+                p.type === "particle"
+                  ? "animate-float-particle absolute rounded-full bg-terracotta"
+                  : "animate-float-diagonal absolute rounded-full bg-sage"
+              }
+              style={{
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                left: p.left,
+                top: p.top,
+                animationDuration: `${p.duration}s`,
+                animationDelay: `${p.delay}s`,
+                opacity: 0.1 + Math.random() * 0.2,
+                borderRadius:
+                  p.size > 4 ? "50% 50% 45% 55% / 48% 52% 50% 50%" : "50%",
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Three.js Globe */}
+        <Globe />
+
+        {/* Top gradient mask: cream to transparent */}
+        <div
+          className="pointer-events-none absolute top-0 left-0 right-0 z-10 h-32"
+          style={{
+            background: `linear-gradient(
+              to bottom,
+              #fdf8f0 0%,
+              rgba(253, 248, 240, 0.7) 35%,
+              transparent 100%
+            )`,
+          }}
+        />
+
+        {/* Bottom gradient mask: cream to transparent */}
+        <div
+          className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-40"
+          style={{
+            background: `linear-gradient(
+              to top,
+              #fdf8f0 0%,
+              rgba(253, 248, 240, 0.7) 35%,
+              transparent 100%
+            )`,
+          }}
+        />
+      </div>
+
+      {/* City cards */}
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-12 mt-8">
+        <div className="grid gap-8 lg:grid-cols-3">
           {locations.map((loc, i) => (
             <ScrollReveal key={loc.city} delay={i * 150}>
               <div
@@ -134,14 +161,14 @@ export default function Locations() {
                   <div
                     className={cn(
                       "organic-oval h-28 w-28 flex items-center justify-center",
-                      loc.accentLight
+                      loc.accentLight,
                     )}
                   >
                     <div
                       className={cn(
                         "flex h-16 w-16 items-center justify-center rounded-full",
                         loc.accent,
-                        "text-cream"
+                        "text-cream",
                       )}
                       style={{
                         borderRadius: "52% 48% 48% 52% / 50% 52% 48% 50%",
@@ -203,7 +230,7 @@ export default function Locations() {
                   className={cn(
                     "mt-6 rounded-full px-2 py-0.5 text-center text-xs font-medium",
                     loc.accentLight,
-                    loc.accentText
+                    loc.accentText,
                   )}
                   style={{
                     borderRadius: "16px 10px 16px 10px / 10px 16px 10px 16px",
