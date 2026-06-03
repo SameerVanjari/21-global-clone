@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import ScrollReveal from "@/components/effects/ScrollReveal";
+import Globe from "@/components/effects/Globe";
 
 const LOCATIONS = [
   {
@@ -35,6 +37,93 @@ const LOCATIONS = [
   },
 ];
 
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationId: number;
+    const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number }[] = [];
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.3 + 0.05,
+      });
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
+        ctx.fill();
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = "rgba(0, 240, 255, 0.3)";
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.5 }}
+    />
+  );
+}
+
+function ScanningLine() {
+  return (
+    <div
+      className="absolute left-0 w-full h-[2px] pointer-events-none z-5"
+      style={{
+        animation: "scan 5s linear infinite",
+        background:
+          "linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.1) 10%, rgba(0, 240, 255, 0.5) 50%, rgba(0, 240, 255, 0.1) 90%, transparent 100%)",
+        boxShadow: "0 0 15px rgba(0, 240, 255, 0.3), 0 0 40px rgba(0, 240, 255, 0.1)",
+      }}
+    />
+  );
+}
+
 export default function Locations() {
   return (
     <section
@@ -46,9 +135,36 @@ export default function Locations() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse at 50% 40%, rgba(0, 240, 255, 0.04) 0%, transparent 60%)",
         }}
       />
+
+      {/* Globe section */}
+      <div className="relative h-[600px] flex items-center justify-center overflow-hidden">
+        <ParticleField />
+
+        {/* Radial glow behind globe */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(0, 240, 255, 0.06) 0%, transparent 70%)",
+          }}
+        />
+
+        <Globe />
+
+        <ScanningLine />
+
+        {/* Gradient mask at bottom of globe area */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-10"
+          style={{
+            background:
+              "linear-gradient(to top, #06060b 0%, rgba(6, 6, 11, 0.8) 30%, transparent 100%)",
+          }}
+        />
+      </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
         <ScrollReveal variant="holo-fade">
@@ -77,115 +193,99 @@ export default function Locations() {
           </div>
         </ScrollReveal>
 
-        <div className="relative">
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none hidden lg:block"
-            style={{
-              width: "600px",
-              height: "600px",
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              border: "1px solid rgba(0, 240, 255, 0.06)",
-              borderRadius: "50%",
-              animation: "globe-rotate 30s linear infinite",
-            }}
-          />
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
-            {LOCATIONS.map((loc, index) => (
-              <ScrollReveal
-                key={loc.city}
-                variant="scale-in"
-                delay={index * 150}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
+          {LOCATIONS.map((loc, index) => (
+            <ScrollReveal
+              key={loc.city}
+              variant="scale-in"
+              delay={index * 150}
+            >
+              <div
+                className="glass holo-shimmer p-8 h-full transition-all duration-500 group relative"
+                style={{ borderRadius: "2px" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${loc.color}66`;
+                  e.currentTarget.style.boxShadow = `0 0 40px ${loc.color}14, inset 0 0 40px ${loc.color}08`;
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(0, 240, 255, 0.15)";
+                  e.currentTarget.style.boxShadow =
+                    "0 0 30px rgba(0, 240, 255, 0.05), inset 0 0 30px rgba(0, 240, 255, 0.02)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
               >
-                <div
-                  className="glass holo-shimmer p-8 h-full transition-all duration-500 group relative"
-                  style={{ borderRadius: "2px" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = `${loc.color}66`;
-                    e.currentTarget.style.boxShadow = `0 0 40px ${loc.color}14, inset 0 0 40px ${loc.color}08`;
-                    e.currentTarget.style.transform = "translateY(-4px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(0, 240, 255, 0.15)";
-                    e.currentTarget.style.boxShadow =
-                      "0 0 30px rgba(0, 240, 255, 0.05), inset 0 0 30px rgba(0, 240, 255, 0.02)";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
-                >
-                  <div className="hud-bracket relative">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div
-                        className="w-2 h-2 rounded-full animate-pulse"
-                        style={{
-                          background: loc.color,
-                          boxShadow: `0 0 8px ${loc.color}`,
-                        }}
-                      />
-                      <div
-                        className="text-xs tracking-[0.2em] uppercase"
-                        style={{
-                          color: loc.color,
-                          fontFamily: "var(--font-mono)",
-                        }}
-                      >
-                        {loc.status}
-                      </div>
-                    </div>
-
-                    <h3
-                      className="text-2xl font-light tracking-wide mb-1"
-                      style={{ color: "#e0e8ff" }}
-                    >
-                      {loc.city}
-                    </h3>
-                    <p
-                      className="text-xs tracking-[0.15em] uppercase mb-4"
-                      style={{ color: loc.color, fontFamily: "var(--font-mono)" }}
-                    >
-                      {loc.hub}
-                    </p>
-
+                <div className="hud-bracket relative">
+                  <div className="flex items-center gap-3 mb-6">
                     <div
-                      className="p-3 mb-5 rounded-sm"
+                      className="w-2 h-2 rounded-full animate-pulse"
                       style={{
-                        background: "rgba(255,255,255,0.02)",
-                        border: "1px solid rgba(255,255,255,0.04)",
-                      }}
-                    >
-                      <div
-                        className="text-[11px] tracking-wider mb-1"
-                        style={{ color: "#667799", fontFamily: "var(--font-mono)" }}
-                      >
-                        COORDS // {loc.coords}
-                      </div>
-                      <div
-                        className="text-[11px] tracking-wider"
-                        style={{ color: "#667799", fontFamily: "var(--font-mono)" }}
-                      >
-                        TIME // {loc.timezone}
-                      </div>
-                    </div>
-
-                    <p
-                      className="text-sm leading-relaxed"
-                      style={{ color: "#667799" }}
-                    >
-                      {loc.description}
-                    </p>
-
-                    <div
-                      className="absolute -left-0.5 top-0 bottom-0 w-[1px] transition-all duration-500 opacity-0 group-hover:opacity-100"
-                      style={{
-                        background: `linear-gradient(180deg, ${loc.color}00, ${loc.color}, ${loc.color}00)`,
+                        background: loc.color,
+                        boxShadow: `0 0 8px ${loc.color}`,
                       }}
                     />
+                    <div
+                      className="text-xs tracking-[0.2em] uppercase"
+                      style={{
+                        color: loc.color,
+                        fontFamily: "var(--font-mono)",
+                      }}
+                    >
+                      {loc.status}
+                    </div>
                   </div>
+
+                  <h3
+                    className="text-2xl font-light tracking-wide mb-1"
+                    style={{ color: "#e0e8ff" }}
+                  >
+                    {loc.city}
+                  </h3>
+                  <p
+                    className="text-xs tracking-[0.15em] uppercase mb-4"
+                    style={{ color: loc.color, fontFamily: "var(--font-mono)" }}
+                  >
+                    {loc.hub}
+                  </p>
+
+                  <div
+                    className="p-3 mb-5 rounded-sm"
+                    style={{
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px solid rgba(255,255,255,0.04)",
+                    }}
+                  >
+                    <div
+                      className="text-[11px] tracking-wider mb-1"
+                      style={{ color: "#667799", fontFamily: "var(--font-mono)" }}
+                    >
+                      COORDS // {loc.coords}
+                    </div>
+                    <div
+                      className="text-[11px] tracking-wider"
+                      style={{ color: "#667799", fontFamily: "var(--font-mono)" }}
+                    >
+                      TIME // {loc.timezone}
+                    </div>
+                  </div>
+
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: "#667799" }}
+                  >
+                    {loc.description}
+                  </p>
+
+                  <div
+                    className="absolute -left-0.5 top-0 bottom-0 w-[1px] transition-all duration-500 opacity-0 group-hover:opacity-100"
+                    style={{
+                      background: `linear-gradient(180deg, ${loc.color}00, ${loc.color}, ${loc.color}00)`,
+                    }}
+                  />
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
+              </div>
+            </ScrollReveal>
+          ))}
         </div>
       </div>
     </section>
