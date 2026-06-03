@@ -1,4 +1,7 @@
+"use client";
+
 import { ScrollReveal } from "@/components/effects/ScrollReveal";
+import { Globe } from "@/components/effects/Globe";
 
 const locations = [
   {
@@ -10,6 +13,9 @@ const locations = [
     timezone: "GST (UTC+4)",
     description:
       "Our Middle East headquarters, positioned in the world's most dynamic commodities hub. Direct access to Gulf energy markets and Asian demand centres.",
+    label: "dxb",
+    lat: 25.2,
+    lng: 55.3,
   },
   {
     city: "Singapore",
@@ -20,6 +26,9 @@ const locations = [
     timezone: "SGT (UTC+8)",
     description:
       "Gateway to APAC markets. LNG, metals, and agricultural flows through Southeast Asia's premier trading and financial centre.",
+    label: "sin",
+    lat: 1.35,
+    lng: 103.8,
   },
   {
     city: "Zug",
@@ -30,6 +39,9 @@ const locations = [
     timezone: "CET (UTC+1)",
     description:
       "Our global headquarters. The home of Swiss precision — risk management, structured finance, and corporate strategy driven from the heart of Europe.",
+    label: "zrh",
+    lat: 47.17,
+    lng: 8.52,
   },
 ];
 
@@ -47,7 +59,77 @@ export function Locations() {
             </h2>
           </ScrollReveal>
 
-          <div className="grid-swiss mt-20 max-md:mt-12">
+          <div className="relative overflow-hidden mt-20 max-md:mt-12">
+            <div className="grid-swiss items-start">
+              <div
+                className="col-span-6 max-md:col-span-4 relative"
+                style={{ height: "480px" }}
+              >
+                <Globe />
+              </div>
+
+              <div className="col-span-6 max-md:col-span-4 max-md:mt-8">
+                <ScrollReveal delay={150}>
+                  <div className="space-y-10">
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="mt-1.5 flex-shrink-0"
+                        style={{
+                          width: "24px",
+                          height: "2px",
+                          backgroundColor: "#e63946",
+                        }}
+                      />
+                      <p className="text-base leading-relaxed text-muted max-w-[420px]">
+                        Our network spans the world&apos;s most critical
+                        commodities corridors. Three strategic locations,
+                        synchronised to the same precision.
+                      </p>
+                    </div>
+
+                    <div className="space-y-5">
+                      {locations.map((loc) => (
+                        <div key={loc.city} className="flex items-center gap-4">
+                          <div
+                            className="flex-shrink-0"
+                            style={{
+                              width: "8px",
+                              height: "8px",
+                              borderRadius: "50%",
+                              backgroundColor: "#e63946",
+                            }}
+                          />
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              {loc.city}
+                            </p>
+                            <p className="text-xs text-muted lowercase">
+                              {loc.label}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </ScrollReveal>
+              </div>
+            </div>
+
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "80px",
+                background:
+                  "linear-gradient(to bottom, transparent, #fafafa)",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+
+          <div className="grid-swiss mt-24 max-md:mt-16">
             {locations.map((location, index) => (
               <ScrollReveal
                 key={location.city}
