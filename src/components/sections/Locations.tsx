@@ -1,4 +1,8 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import ScrollReveal from "@/components/effects/ScrollReveal";
+import Globe from "@/components/effects/Globe";
 import { cn } from "@/lib/utils";
 
 const locations = [
@@ -34,15 +38,72 @@ const locations = [
   },
 ];
 
+const particles = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  size: 2 + Math.random() * 5,
+  left: `${15 + Math.random() * 70}%`,
+  top: `${10 + Math.random() * 55}%`,
+  duration: 10 + Math.random() * 20,
+  delay: Math.random() * 15,
+  type: Math.random() > 0.5 ? "particle" : "diagonal",
+}));
+
 export default function Locations() {
+  const sectionRef = useRef<HTMLElement>(null);
+
   return (
     <section
+      ref={sectionRef}
       id="locations"
-      className="relative overflow-hidden bg-surface py-24 lg:py-32 wave-diagonal-down"
+      className="relative overflow-hidden bg-cream pt-0 pb-24 lg:pb-32"
     >
-      <div className="absolute inset-0 leaf-vein-terracotta" />
+      {/* Globe area */}
+      <div className="relative h-[380px] sm:h-[440px] overflow-hidden">
+        {/* Floating particles around globe */}
+        <div className="pointer-events-none absolute inset-0">
+          {particles.map((p) => (
+            <div
+              key={p.id}
+              className={
+                p.type === "particle"
+                  ? "animate-float-particle absolute rounded-full bg-terracotta"
+                  : "animate-float-diagonal absolute rounded-full bg-sage"
+              }
+              style={{
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                left: p.left,
+                top: p.top,
+                animationDuration: `${p.duration}s`,
+                animationDelay: `${p.delay}s`,
+                opacity: 0.12 + Math.random() * 0.18,
+                borderRadius:
+                  p.size > 4 ? "50% 50% 45% 55% / 48% 52% 50% 50%" : "50%",
+              }}
+            />
+          ))}
+        </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
+        <Globe />
+
+        {/* Organic gradient mask at bottom of globe area */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-10 h-40"
+          style={{
+            background: `linear-gradient(
+              to bottom,
+              transparent 0%,
+              rgba(253, 248, 240, 0.4) 25%,
+              rgba(253, 248, 240, 0.8) 55%,
+              #fdf8f0 85%
+            )`,
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 75% 90%, 50% 100%, 25% 88%, 0 100%)",
+          }}
+        />
+      </div>
+
+      {/* Content below globe */}
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-12 -mt-10">
         <ScrollReveal>
           <p className="mb-3 font-[family-name:var(--font-body)] text-sm font-medium tracking-widest text-terracotta uppercase">
             Global Presence
@@ -63,7 +124,7 @@ export default function Locations() {
           {locations.map((loc, i) => (
             <ScrollReveal key={loc.city} delay={i * 150}>
               <div
-                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-sand/50 bg-cream p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-terracotta/5"
+                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-sand/50 bg-surface p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-terracotta/5"
                 style={{
                   borderRadius: "36px 22px 36px 22px / 28px 36px 22px 36px",
                 }}
@@ -119,8 +180,11 @@ export default function Locations() {
                   {loc.country}
                 </p>
 
-                <div className={cn("mx-auto mb-6 h-px w-16", loc.accent.replace("bg-", "bg-") + "/30")}
+                <div
+                  className="mx-auto mb-6"
                   style={{
+                    width: 64,
+                    height: 1,
                     background:
                       i === 0
                         ? "var(--terracotta)"
@@ -128,7 +192,6 @@ export default function Locations() {
                           ? "var(--sage)"
                           : "var(--clay)",
                     opacity: 0.3,
-                    height: 1,
                   }}
                 />
 
