@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface-dark: var(--surface-dark);
+  --color-shadow: var(--shadow-color);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-manrope);
+  --font-heading: var(--font-manrope);
+}
+
+:root {
+  --background: #f5f2ed;
+  --foreground: #1a1a1a;
+  --surface-dark: #1c1c1e;
+  --shadow-color: #0a0a0a;
+  --muted: #d6d3cc;
+  --muted-foreground: #78776e;
+  --radius: 0px;
+}
+
+.dark {
+  --background: #1c1c1e;
+  --foreground: #f5f2ed;
+  --surface-dark: #0a0a0a;
+  --shadow-color: #000000;
+  --muted: #2c2c2e;
+  --muted-foreground: #9a9994;
+}
+
+* {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+}
+
+html {
+  font-family: var(--font-manrope);
+  background-color: var(--background);
+  color: var(--foreground);
+  scroll-behavior: auto;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@utility shadow-architectural {
+  box-shadow:
+    0 2px 4px rgba(10, 10, 10, 0.04),
+    0 8px 16px rgba(10, 10, 10, 0.06),
+    0 24px 48px rgba(10, 10, 10, 0.08),
+    0 64px 96px rgba(10, 10, 10, 0.04);
+}
+
+@utility shadow-architectural-deep {
+  box-shadow:
+    0 2px 4px rgba(10, 10, 10, 0.08),
+    0 8px 16px rgba(10, 10, 10, 0.12),
+    0 24px 48px rgba(10, 10, 10, 0.16),
+    0 64px 128px rgba(10, 10, 10, 0.08),
+    0 128px 256px rgba(10, 10, 10, 0.04);
+}
+
+@utility shadow-architectural-bottom {
+  box-shadow:
+    0 4px 8px rgba(10, 10, 10, 0.04),
+    0 16px 32px rgba(10, 10, 10, 0.06),
+    0 48px 96px rgba(10, 10, 10, 0.08);
+}
+
+@utility shadow-text-architectural {
+  text-shadow:
+    0 2px 4px rgba(10, 10, 10, 0.12),
+    0 8px 16px rgba(10, 10, 10, 0.08),
+    0 24px 48px rgba(10, 10, 10, 0.04);
+}
+
+@utility section-light {
+  background-color: #f5f2ed;
+  color: #1a1a1a;
+}
+
+@utility section-dark {
+  background-color: #1c1c1e;
+  color: #f5f2ed;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.96);
+    filter: brightness(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shadow-deepen {
+  from {
+    box-shadow:
+      0 0 0 rgba(10, 10, 10, 0),
+      0 0 0 rgba(10, 10, 10, 0),
+      0 0 0 rgba(10, 10, 10, 0);
+  }
+  to {
+    box-shadow:
+      0 4px 8px rgba(10, 10, 10, 0.06),
+      0 16px 32px rgba(10, 10, 10, 0.08),
+      0 48px 96px rgba(10, 10, 10, 0.1);
+  }
+}
+
+@utility animate-reveal-up {
+  animation: reveal-up 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility animate-reveal-scale {
+  animation: reveal-scale 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility animate-shadow-deepen {
+  animation: shadow-deepen 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility scroll-reveal-hidden {
+  opacity: 0;
+  transform: translateY(60px) scale(0.96);
+  filter: brightness(0.4);
+}
+
+@utility scroll-reveal-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: brightness(1);
+  transition:
+    opacity 2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 2s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
