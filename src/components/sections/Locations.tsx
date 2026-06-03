@@ -1,8 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import ScrollReveal from "@/components/effects/ScrollReveal";
-import Globe from "@/components/effects/Globe";
 import { MapPin } from "lucide-react";
+
+const Globe = dynamic(() => import("@/components/effects/Globe"), { ssr: false });
 
 const locations = [
   {
@@ -33,11 +35,9 @@ const locations = [
 
 export default function Locations() {
   return (
-    <section id="locations" className="relative py-24 lg:py-32 scroll-section overflow-hidden">
-      <div className="absolute inset-0 bg-surface" />
-
+    <section id="locations" className="relative py-24 lg:py-32 scroll-section overflow-hidden bg-deep">
+      {/* Section header */}
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        {/* Section header */}
         <div className="text-center mb-12">
           <ScrollReveal sparkle>
             <p className="text-gold-300/60 text-xs tracking-[0.4em] uppercase mb-4 font-light">
@@ -57,44 +57,40 @@ export default function Locations() {
             </div>
           </ScrollReveal>
         </div>
+      </div>
 
-        {/* Globe area */}
-        <ScrollReveal delay={0.3}>
-          <div className="relative w-full mb-16">
-            <div className="relative w-full h-[380px] sm:h-[420px] lg:h-[480px] overflow-hidden">
-              {/* Gold gradient mask at bottom */}
-              <div
-                className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10"
-                style={{
-                  background: "linear-gradient(to bottom, transparent 0%, #131620 100%)",
-                }}
-              />
-              {/* Gold gradient mask at top (subtle) */}
-              <div
-                className="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10"
-                style={{
-                  background: "linear-gradient(to top, transparent 0%, rgba(19, 22, 32, 0.6) 100%)",
-                }}
-              />
-              <Globe />
-            </div>
-
-            {/* Decorative diamond border ring around globe area */}
-            <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-[70%] bg-gradient-to-b from-transparent via-gold-300/10 to-transparent" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-[60%] bg-gradient-to-r from-transparent via-gold-300/10 to-transparent" />
-            </div>
+      {/* Globe area */}
+      <ScrollReveal delay={0.3}>
+        <div className="relative w-full mb-16 overflow-hidden">
+          <div className="relative w-full h-[500px] md:h-[650px]">
+            {/* Top gradient mask */}
+            <div
+              className="absolute top-0 left-0 right-0 h-20 pointer-events-none z-10"
+              style={{
+                background: "linear-gradient(to top, transparent 0%, #0a0c10 100%)",
+              }}
+            />
+            {/* Bottom gradient mask */}
+            <div
+              className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none z-10"
+              style={{
+                background: "linear-gradient(to bottom, transparent 0%, #0a0c10 100%)",
+              }}
+            />
+            <Globe className="w-full h-full block" />
           </div>
-        </ScrollReveal>
+        </div>
+      </ScrollReveal>
 
-        {/* Geometric divider */}
+      {/* Geometric divider */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <ScrollReveal delay={0.4}>
           <div className="max-w-xl mx-auto mb-16">
             <div className="ornate-divider" />
           </div>
         </ScrollReveal>
 
-        {/* Three-column symmetrical layout */}
+        {/* Three-column city cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-1 bg-gold-300/5 max-w-5xl mx-auto">
           {locations.map((loc, i) => (
             <ScrollReveal key={loc.city} delay={0.5 + 0.15 * i} direction="up">
