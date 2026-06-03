@@ -7,6 +7,7 @@ import DotNav from "@/components/layout/DotNav";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/sections/Hero";
 import Services from "@/components/sections/Services";
+import Process from "@/components/sections/Process";
 import About from "@/components/sections/About";
 import Locations from "@/components/sections/Locations";
 import Contact from "@/components/sections/Contact";
@@ -42,6 +43,7 @@ export default function Home() {
       <main>
         <Hero />
         <Services />
+        <Process />
         <About />
         <Locations />
         <Contact />

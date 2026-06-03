@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Globe from "@/components/effects/Globe";
 
 const LOCATIONS = [
   {
@@ -73,9 +74,19 @@ export default function Locations() {
     <section
       id="locations"
       ref={sectionRef}
-      className="bg-surface border-brutal-thick-t border-brutal-thick-b py-24"
+      className="bg-surface border-brutal-thick-t border-brutal-thick-b relative overflow-hidden"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="relative h-[60vh] -mt-12 -mb-16">
+        <Globe className="absolute inset-0" />
+        <div
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+          style={{
+            background: "linear-gradient(to bottom, transparent, #141418)",
+          }}
+        />
+      </div>
+
+      <div className="mx-auto max-w-7xl px-6 pb-24 relative z-10">
         <div className="mb-16">
           <span className="text-eyebrow text-amber block mb-4">
             <span className="text-amber">{">"}</span> GLOBAL NODES
