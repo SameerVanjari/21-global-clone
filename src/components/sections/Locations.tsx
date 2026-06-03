@@ -1,7 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { ScrollReveal } from "@/components/effects/ScrollReveal";
-import { Globe } from "@/components/effects/Globe";
+
+const Globe = dynamic(
+  () => import("@/components/effects/Globe").then((mod) => ({ default: mod.Globe })),
+  { ssr: false },
+);
 
 const locations = [
   {
@@ -9,10 +14,10 @@ const locations = [
     country: "United Arab Emirates",
     address: "Almas Tower, Level 23",
     district: "DMCC Free Zone",
-    coordinates: "25°04'N 55°08'E",
+    coordinates: "25\u00b004\u2019N 55\u00b008\u2019E",
     timezone: "GST (UTC+4)",
     description:
-      "Our Middle East headquarters, positioned in the world's most dynamic commodities hub. Direct access to Gulf energy markets and Asian demand centres.",
+      "Our Middle East headquarters, positioned in the world\u2019s most dynamic commodities hub. Direct access to Gulf energy markets and Asian demand centres.",
     label: "dxb",
     lat: 25.2,
     lng: 55.3,
@@ -22,32 +27,32 @@ const locations = [
     country: "Singapore",
     address: "One Raffles Place, Level 42",
     district: "Central Business District",
-    coordinates: "1°17'N 103°51'E",
+    coordinates: "1\u00b017\u2019N 103\u00b051\u2019E",
     timezone: "SGT (UTC+8)",
     description:
-      "Gateway to APAC markets. LNG, metals, and agricultural flows through Southeast Asia's premier trading and financial centre.",
+      "Gateway to APAC markets. LNG, metals, and agricultural flows through Southeast Asia\u2019s premier trading and financial centre.",
     label: "sin",
     lat: 1.35,
     lng: 103.8,
   },
   {
-    city: "Zug",
+    city: "Geneva",
     country: "Switzerland",
-    address: "Baarerstrasse 78",
-    district: "Canton Zug",
-    coordinates: "47°10'N 8°31'E",
+    address: "Rue du Rh\u00f4ne 42",
+    district: "Quartier des Banques",
+    coordinates: "46\u00b012\u2019N 6\u00b008\u2019E",
     timezone: "CET (UTC+1)",
     description:
-      "Our global headquarters. The home of Swiss precision — risk management, structured finance, and corporate strategy driven from the heart of Europe.",
-    label: "zrh",
-    lat: 47.17,
-    lng: 8.52,
+      "Our global headquarters. The home of Swiss precision \u2014 risk management, structured finance, and corporate strategy driven from the heart of Europe.",
+    label: "gva",
+    lat: 46.2,
+    lng: 6.15,
   },
 ];
 
 export function Locations() {
   return (
-    <section id="locations" className="bg-paper">
+    <section id="locations" className="bg-white">
       <div className="section-divider" />
       <div className="section-swiss">
         <div className="max-w-[1440px] mx-auto">
@@ -60,6 +65,15 @@ export function Locations() {
           </ScrollReveal>
 
           <div className="relative overflow-hidden mt-20 max-md:mt-12">
+            {/* Top gradient mask */}
+            <div
+              className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
+              style={{
+                height: "80px",
+                background: "linear-gradient(to top, transparent, #ffffff)",
+              }}
+            />
+
             <div className="grid-swiss items-start">
               <div
                 className="col-span-6 max-md:col-span-4 relative"
@@ -115,16 +129,12 @@ export function Locations() {
               </div>
             </div>
 
+            {/* Bottom gradient mask */}
             <div
+              className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none"
               style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
                 height: "80px",
-                background:
-                  "linear-gradient(to bottom, transparent, #fafafa)",
-                pointerEvents: "none",
+                background: "linear-gradient(to bottom, transparent, #ffffff)",
               }}
             />
           </div>
@@ -141,7 +151,9 @@ export function Locations() {
                     <div className="text-muted text-xs font-medium tracking-[0.1em] uppercase text-center leading-tight">
                       {location.city
                         .split("")
-                        .map((c) => (c === c.toUpperCase() && c !== " " ? c : ""))
+                        .map((c) =>
+                          c === c.toUpperCase() && c !== " " ? c : "",
+                        )
                         .join("")
                         .slice(0, 3)}
                     </div>
