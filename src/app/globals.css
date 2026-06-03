@@ -1,0 +1,470 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-light: var(--terracotta-light);
+  --color-sage: var(--sage);
+  --color-sage-dark: var(--sage-dark);
+  --color-clay: var(--clay);
+  --color-sand: var(--sand);
+  --color-bark: var(--bark);
+  --color-ink: var(--ink);
+  --color-cream: var(--cream);
+  --color-surface: var(--surface);
+
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-body);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --cream: #fdf8f0;
+  --surface: #faf3e8;
+  --terracotta: #c26941;
+  --terracotta-light: #e8a87c;
+  --sage: #7d9b76;
+  --sage-dark: #5a7a53;
+  --clay: #a0523b;
+  --sand: #e8d5c4;
+  --bark: #3d2b1f;
+  --ink: #2c2416;
+
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--cream);
+  --popover-foreground: var(--ink);
+  --primary: var(--terracotta);
+  --primary-foreground: var(--cream);
+  --secondary: var(--sage);
+  --secondary-foreground: var(--cream);
+  --muted: var(--sand);
+  --muted-foreground: var(--clay);
+  --accent: var(--terracotta-light);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--sand);
+  --input: var(--surface);
+  --ring: var(--terracotta);
+  --chart-1: var(--terracotta);
+  --chart-2: var(--sage);
+  --chart-3: var(--terracotta-light);
+  --chart-4: var(--sage-dark);
+  --chart-5: var(--clay);
+  --radius: 0.75rem;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--terracotta);
+  --sidebar-primary-foreground: var(--cream);
+  --sidebar-accent: var(--sand);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--sand);
+  --sidebar-ring: var(--terracotta);
+}
+
+.dark {
+  --background: var(--ink);
+  --foreground: var(--cream);
+  --card: var(--bark);
+  --card-foreground: var(--cream);
+  --popover: var(--bark);
+  --popover-foreground: var(--cream);
+  --primary: var(--terracotta-light);
+  --primary-foreground: var(--bark);
+  --secondary: var(--sage);
+  --secondary-foreground: var(--cream);
+  --muted: var(--bark);
+  --muted-foreground: var(--sand);
+  --accent: var(--terracotta);
+  --accent-foreground: var(--cream);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: var(--clay);
+  --input: var(--bark);
+  --ring: var(--terracotta-light);
+  --sidebar: var(--bark);
+  --sidebar-foreground: var(--cream);
+  --sidebar-primary: var(--terracotta-light);
+  --sidebar-primary-foreground: var(--bark);
+  --sidebar-accent: var(--clay);
+  --sidebar-accent-foreground: var(--cream);
+  --sidebar-border: var(--clay);
+  --sidebar-ring: var(--terracotta-light);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-cream text-ink;
+    font-family: var(--font-body), Georgia, serif;
+  }
+  html {
+    scroll-behavior: auto;
+    overflow-x: hidden;
+  }
+}
+
+/* ── Organic Blob Shapes ── */
+.blob {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+.blob-alt {
+  border-radius: 40% 60% 70% 30% / 30% 60% 40% 70%;
+}
+
+.blob-wide {
+  border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%;
+}
+
+@keyframes blob-morph {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg);
+  }
+  25% {
+    border-radius: 40% 60% 70% 30% / 30% 60% 40% 70%;
+    transform: rotate(3deg);
+  }
+  50% {
+    border-radius: 30% 70% 40% 60% / 50% 40% 60% 30%;
+    transform: rotate(1deg);
+  }
+  75% {
+    border-radius: 70% 30% 60% 40% / 40% 70% 30% 60%;
+    transform: rotate(-2deg);
+  }
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes blob-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(2%, -1%) scale(1.03);
+  }
+  66% {
+    transform: translate(-1%, 1%) scale(0.98);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.animate-blob-morph {
+  animation: blob-morph 12s ease-in-out infinite;
+}
+
+.animate-blob-drift {
+  animation: blob-drift 14s ease-in-out infinite;
+}
+
+.animate-blob-drift-slow {
+  animation: blob-drift 20s ease-in-out infinite;
+}
+
+/* ── Floating Particles (Pollen / Dust Motes) ── */
+@keyframes float-particle {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.3;
+  }
+  20% {
+    transform: translateY(-30px) translateX(15px) scale(1.1);
+    opacity: 0.7;
+  }
+  40% {
+    transform: translateY(-60px) translateX(-10px) scale(0.9);
+    opacity: 0.5;
+  }
+  60% {
+    transform: translateY(-90px) translateX(20px) scale(1.2);
+    opacity: 0.8;
+  }
+  80% {
+    transform: translateY(-45px) translateX(-20px) scale(1);
+    opacity: 0.4;
+  }
+}
+
+@keyframes float-diagonal {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.2;
+  }
+  25% {
+    transform: translateY(-40px) translateX(-25px) scale(1.3);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-80px) translateX(10px) scale(0.9);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-20px) translateX(30px) scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle linear infinite;
+}
+
+.animate-float-diagonal {
+  animation: float-diagonal linear infinite;
+}
+
+/* ── Bloom Reveal ── */
+@keyframes bloom {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes bloom-up {
+  from {
+    transform: translateY(40px) scale(0.9);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.bloom-in {
+  opacity: 0;
+  transform: scale(0.85);
+  filter: blur(6px);
+}
+
+.bloom-in.visible {
+  animation: bloom 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.bloom-up {
+  opacity: 0;
+  transform: translateY(40px) scale(0.9);
+  filter: blur(4px);
+}
+
+.bloom-up.visible {
+  animation: bloom-up 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ── Gentle Sway / Float on Hover ── */
+@keyframes sway {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(3px) rotate(0.5deg);
+  }
+  75% {
+    transform: translateX(-3px) rotate(-0.5deg);
+  }
+}
+
+.hover-sway {
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hover-sway:hover {
+  animation: sway 2s ease-in-out infinite;
+}
+
+/* ── Breathing Section Background ── */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 6s ease-in-out infinite;
+}
+
+/* ── Wavy Section Dividers ── */
+.wave-down {
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+}
+
+.wave-up {
+  clip-path: polygon(0 15%, 50% 0, 100% 15%, 100% 100%, 0 100%);
+}
+
+.wave-diagonal-down {
+  clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 90%);
+}
+
+.wave-diagonal-up {
+  clip-path: polygon(0 10%, 100% 0, 100% 90%, 0 100%);
+}
+
+/* ── Leaf Vein Pattern ── */
+.leaf-vein {
+  position: relative;
+}
+
+.leaf-vein::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image:
+    linear-gradient(135deg, var(--sage) 1px, transparent 1px),
+    linear-gradient(45deg, var(--sage) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.leaf-vein-terracotta::before {
+  opacity: 0.05;
+  background-image:
+    linear-gradient(135deg, var(--terracotta) 1px, transparent 1px),
+    linear-gradient(45deg, var(--terracotta) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 0;
+}
+
+/* ── Organic Circular Image Crop ── */
+.organic-circle {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.organic-oval {
+  border-radius: 45% 55% 55% 45% / 48% 52% 48% 52%;
+  overflow: hidden;
+}
+
+.organic-oval-alt {
+  border-radius: 55% 45% 48% 52% / 52% 48% 55% 45%;
+  overflow: hidden;
+}
+
+/* ── Organic Gradient Blobs ── */
+.blob-gradient-terracotta {
+  background: radial-gradient(
+    ellipse at 40% 40%,
+    rgba(194, 105, 65, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+.blob-gradient-sage {
+  background: radial-gradient(
+    ellipse at 60% 60%,
+    rgba(125, 155, 118, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+.blob-gradient-warm {
+  background:
+    radial-gradient(
+      ellipse at 30% 30%,
+      rgba(194, 105, 65, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 70%,
+      rgba(232, 168, 124, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(125, 155, 118, 0.06) 0%,
+      transparent 50%
+    );
+}
+
+/* ── Smooth Scrollbar ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
