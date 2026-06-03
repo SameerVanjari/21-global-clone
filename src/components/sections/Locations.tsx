@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import ScrollReveal from "@/components/effects/ScrollReveal";
-import Globe from "@/components/effects/Globe";
+
+const Globe = dynamic(() => import("@/components/effects/Globe"), {
+  ssr: false,
+});
 
 const LOCATIONS = [
   {
@@ -26,12 +30,12 @@ const LOCATIONS = [
     status: "ACTIVE",
   },
   {
-    city: "Zurich",
+    city: "Geneva",
     hub: "European Hub",
-    coords: "47.3769° N, 8.5417° E",
+    coords: "46.2044° N, 6.1432° E",
     timezone: "CET (UTC+1)",
     description:
-      "Swiss precision operations on Bahnhofstrasse. Precious metals vaulting, European energy trading, and structured finance center.",
+      "Swiss precision operations on Rue du Rhône. Precious metals vaulting, European energy trading, and structured finance center.",
     color: "#ffaa00",
     status: "ACTIVE",
   },
@@ -47,7 +51,14 @@ function ParticleField() {
     if (!ctx) return;
 
     let animationId: number;
-    const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number }[] = [];
+    const particles: {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      alpha: number;
+    }[] = [];
 
     const resize = () => {
       canvas.width = canvas.offsetWidth;
@@ -110,20 +121,6 @@ function ParticleField() {
   );
 }
 
-function ScanningLine() {
-  return (
-    <div
-      className="absolute left-0 w-full h-[2px] pointer-events-none z-5"
-      style={{
-        animation: "scan 5s linear infinite",
-        background:
-          "linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.1) 10%, rgba(0, 240, 255, 0.5) 50%, rgba(0, 240, 255, 0.1) 90%, transparent 100%)",
-        boxShadow: "0 0 15px rgba(0, 240, 255, 0.3), 0 0 40px rgba(0, 240, 255, 0.1)",
-      }}
-    />
-  );
-}
-
 export default function Locations() {
   return (
     <section
@@ -140,8 +137,17 @@ export default function Locations() {
       />
 
       {/* Globe section */}
-      <div className="relative h-[600px] flex items-center justify-center overflow-hidden">
+      <div className="relative h-[500px] md:h-[650px] flex items-center justify-center overflow-hidden">
         <ParticleField />
+
+        {/* Top gradient mask */}
+        <div
+          className="absolute top-0 left-0 right-0 h-40 pointer-events-none z-10"
+          style={{
+            background:
+              "linear-gradient(to bottom, #06060b 0%, rgba(6, 6, 11, 0.8) 30%, transparent 100%)",
+          }}
+        />
 
         {/* Radial glow behind globe */}
         <div
@@ -154,9 +160,7 @@ export default function Locations() {
 
         <Globe />
 
-        <ScanningLine />
-
-        {/* Gradient mask at bottom of globe area */}
+        {/* Bottom gradient mask */}
         <div
           className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-10"
           style={{
@@ -209,7 +213,8 @@ export default function Locations() {
                   e.currentTarget.style.transform = "translateY(-4px)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(0, 240, 255, 0.15)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(0, 240, 255, 0.15)";
                   e.currentTarget.style.boxShadow =
                     "0 0 30px rgba(0, 240, 255, 0.05), inset 0 0 30px rgba(0, 240, 255, 0.02)";
                   e.currentTarget.style.transform = "translateY(0)";
@@ -243,7 +248,10 @@ export default function Locations() {
                   </h3>
                   <p
                     className="text-xs tracking-[0.15em] uppercase mb-4"
-                    style={{ color: loc.color, fontFamily: "var(--font-mono)" }}
+                    style={{
+                      color: loc.color,
+                      fontFamily: "var(--font-mono)",
+                    }}
                   >
                     {loc.hub}
                   </p>
@@ -257,13 +265,19 @@ export default function Locations() {
                   >
                     <div
                       className="text-[11px] tracking-wider mb-1"
-                      style={{ color: "#667799", fontFamily: "var(--font-mono)" }}
+                      style={{
+                        color: "#667799",
+                        fontFamily: "var(--font-mono)",
+                      }}
                     >
                       COORDS // {loc.coords}
                     </div>
                     <div
                       className="text-[11px] tracking-wider"
-                      style={{ color: "#667799", fontFamily: "var(--font-mono)" }}
+                      style={{
+                        color: "#667799",
+                        fontFamily: "var(--font-mono)",
+                      }}
                     >
                       TIME // {loc.timezone}
                     </div>
