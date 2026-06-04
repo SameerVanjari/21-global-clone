@@ -25,7 +25,7 @@ export default function Hero() {
       >
         <DitherShader
           src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2670&auto=format&fit=crop"
-          gridSize={2}
+          gridSize={1}
           ditherMode="bayer"
           colorMode="grayscale"
           invert={false}
@@ -85,16 +85,16 @@ export default function Hero() {
 
         {/* CTA */}
         <ScrollReveal delay={650}>
-          <div className="flex flex-wrap gap-6 items-center">
+          <div className="flex flex-wrap gap-6 items-center max-sm:flex-col max-sm:w-full">
             <a
               href="#services"
-              className="font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.22em] uppercase text-[var(--color-cream)] bg-[var(--color-ink)] px-8 py-4 hover:bg-[var(--color-gold)] transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.22em] uppercase text-[var(--color-cream)] bg-[var(--color-ink)] px-8 py-4 hover:bg-[var(--color-gold)] transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] max-sm:w-full max-sm:text-center"
             >
               Explore Our Work
             </a>
             <a
               href="#about"
-              className="font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.22em] uppercase text-[var(--color-ink)]/70 hover:text-[var(--color-ink)] hover:bg-white transition-all duration-300 px-8 py-4 glass-effect rounded-none!"
+              className="font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.22em] uppercase text-[var(--color-ink)]/70 hover:text-[var(--color-ink)] hover:bg-white transition-all duration-300 px-8 py-4 glass-effect rounded-none! max-sm:w-full max-sm:text-center"
             >
               Learn More
             </a>
