@@ -1,4 +1,12 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import ScrollReveal from "@/components/effects/ScrollReveal";
+
+const DitherShader = dynamic(
+  () => import("@/components/ui/dither-shader").then((m) => m.default),
+  { ssr: false }
+);
 
 export default function Hero() {
   return (
@@ -6,15 +14,34 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex flex-col justify-center section-padding pt-36 pb-20 overflow-hidden"
     >
+      {/* Dithered mountain background */}
+      <div className="absolute inset-0 z-0">
+        <DitherShader
+          src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2670&auto=format&fit=crop"
+          gridSize={2}
+          ditherMode="bayer"
+          colorMode="grayscale"
+          invert={false}
+          animated={true}
+          animationSpeed={0.03}
+          primaryColor="#1a1a2e"
+          secondaryColor="#fbf8f4"
+          threshold={0.55}
+          className="w-full h-full object-cover"
+        />
+        {/* Gradient overlay to blend background into cream */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-cream)]/60 via-[var(--color-cream)]/40 to-[var(--color-cream)]/95 pointer-events-none" />
+      </div>
+
       {/* Background numeral */}
-      <div className="absolute top-[15%] right-[5%] md:right-[8%] lg:right-[10%] numeral select-none pointer-events-none">
+      <div className="absolute top-[15%] right-[5%] md:right-[8%] lg:right-[10%] numeral select-none pointer-events-none z-10">
         01
       </div>
 
       {/* Subtle grain */}
-      <div className="absolute inset-0 grain-overlay" />
+      <div className="absolute inset-0 grain-overlay z-10" />
 
-      <div className="max-w-[1100px]">
+      <div className="relative z-20 max-w-[1100px]">
         {/* Eyebrow */}
         <ScrollReveal delay={100}>
           <span className="block text-eyebrow text-[var(--color-gold)] mb-8">
