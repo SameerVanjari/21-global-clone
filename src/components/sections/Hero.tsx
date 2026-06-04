@@ -14,8 +14,15 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex flex-col justify-center section-padding pt-36 pb-20 overflow-hidden"
     >
-      {/* Dithered mountain background */}
-      <div className="absolute inset-0 z-0">
+      {/* Dithered mountain background — right side only */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          maskImage: "linear-gradient(to right, transparent 30%, black 60%)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 30%, black 60%)",
+        }}
+      >
         <DitherShader
           src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2670&auto=format&fit=crop"
           gridSize={2}
@@ -67,7 +74,7 @@ export default function Hero() {
 
         {/* Lead paragraph */}
         <ScrollReveal delay={500}>
-          <div className="inline-block glass-effect px-6 py-5 mb-10 max-w-[660px]">
+          <div className="inline-block glass-eff px-6 py-5 mb-10 max-w-[660px]">
             <p className="text-lead text-[var(--color-ink-muted)] max-w-[620px] leading-[1.85] font-light">
               We source, finance, and deliver high-quality commodities across
               global markets — bridging supply with demand through strategic
