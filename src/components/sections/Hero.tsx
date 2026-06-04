@@ -5,7 +5,7 @@ import ScrollReveal from "@/components/effects/ScrollReveal";
 
 const DitherShader = dynamic(
   () => import("@/components/ui/dither-shader").then((m) => m.default),
-  { ssr: false }
+  { ssr: false },
 );
 
 export default function Hero() {
@@ -67,11 +67,13 @@ export default function Hero() {
 
         {/* Lead paragraph */}
         <ScrollReveal delay={500}>
-          <p className="text-lead text-[var(--color-ink-muted)] max-w-[620px] mb-10 leading-[1.85] font-light">
-            We source, finance, and deliver high-quality commodities across
-            global markets — bridging supply with demand through strategic
-            depth and unwavering reliability.
-          </p>
+          <div className="inline-block glass-effect px-6 py-5 mb-10 max-w-[660px]">
+            <p className="text-lead text-[var(--color-ink-muted)] max-w-[620px] leading-[1.85] font-light">
+              We source, finance, and deliver high-quality commodities across
+              global markets — bridging supply with demand through strategic
+              depth and unwavering reliability.
+            </p>
+          </div>
         </ScrollReveal>
 
         {/* CTA */}
@@ -85,7 +87,7 @@ export default function Hero() {
             </a>
             <a
               href="#about"
-              className="font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.22em] uppercase text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors duration-300 border-b border-[var(--color-divider-strong)] pb-1 hover:border-[var(--color-ink)]"
+              className="font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.22em] uppercase text-[var(--color-ink)]/70 hover:text-[var(--color-ink)] hover:bg-white transition-all duration-300 px-8 py-4 glass-effect rounded-none!"
             >
               Learn More
             </a>

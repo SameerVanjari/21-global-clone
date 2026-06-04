@@ -36,6 +36,7 @@ const PAUSE_DURATION = 6000;
 const TRANSITION_DURATION = 600;
 
 export default function Process() {
+  const sectionRef = useRef<HTMLElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [prevIndex, setPrevIndex] = useState(0);
@@ -60,6 +61,19 @@ export default function Process() {
       setActiveIndex((prev) => (prev + 1) % STEPS.length);
     }, AUTO_INTERVAL);
   }, [clearTimers]);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsPaused(!entry.isIntersecting);
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isPaused) {
@@ -108,7 +122,7 @@ export default function Process() {
   };
 
   return (
-    <section id="process" className="section-padding bg-[var(--color-paper)]">
+    <section id="process" ref={sectionRef} className="section-padding bg-[var(--color-paper)]">
       <ScrollReveal>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 lg:mb-24">
           <div className="lg:col-span-4">
@@ -138,7 +152,7 @@ export default function Process() {
 
       <ScrollReveal delay={200}>
         {/* Step flow — horizontal row */}
-        <div className="flex items-start justify-between mb-14 lg:mb-20 overflow-x-auto pb-4 md:pb-0">
+        <div className="flex items-start justify-between mb-14 lg:mb-20 overflow-x-auto pb-4 md:pb-0 px-1 md:px-2 pt-6 md:pt-8">
           {STEPS.map((step, i) => {
             const isActive = i === activeIndex;
             const isCompleted = i < activeIndex;
@@ -248,7 +262,7 @@ export default function Process() {
                   <span
                     className={`font-[family-name:var(--font-dm-sans)] text-[3rem] md:text-[4rem] font-thin leading-none tracking-[-0.03em] ${
                       isActive
-                        ? "text-[var(--color-ink)]/6"
+                        ? "text-[var(--color-ink)]/15"
                         : "text-[var(--color-ink)]/0"
                     }`}
                   >

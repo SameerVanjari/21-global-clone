@@ -69,7 +69,7 @@ export default function Services() {
               } border-[var(--color-divider)]`}
             >
               {/* Numeral */}
-              <span className="block font-[family-name:var(--font-dm-sans)] text-[4rem] md:text-[5rem] font-thin leading-none tracking-[-0.03em] text-[var(--color-ink)]/6 mb-6 select-none transition-colors duration-500 group-hover:text-[var(--color-gold)]/20">
+              <span className="block font-[family-name:var(--font-dm-sans)] text-[4rem] md:text-[5rem] font-thin leading-none tracking-[-0.03em] text-[var(--color-ink)]/15 mb-6 select-none transition-colors duration-500 group-hover:text-[var(--color-gold)]/40">
                 {service.numeral}
               </span>
 

@@ -2,11 +2,8 @@ import ScrollReveal from "@/components/effects/ScrollReveal";
 
 export default function Contact() {
   return (
-    <section id="contact" className="section-padding relative overflow-hidden">
-      {/* Background numeral */}
-      <div className="absolute bottom-0 right-[5%] md:right-[8%] lg:right-[10%] numeral select-none pointer-events-none">
-        05
-      </div>
+    <section id="contact" className="py-20 md:py-28 px-[5%] md:px-[8%] lg:px-[10%] relative overflow-hidden">
+
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
         <div className="lg:col-span-5">

@@ -41,7 +41,7 @@ export default function NavHeader() {
         className={`flex items-center justify-between px-6 py-4 md:px-8 transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           scrolled
             ? "bg-white/90 backdrop-blur-xl border border-[var(--color-divider)] shadow-[0_10px_40px_rgba(26,26,46,0.04)]"
-            : "bg-transparent"
+            : "glass-effect"
         }`}
       >
         <a
@@ -50,7 +50,7 @@ export default function NavHeader() {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          className="font-[family-name:var(--font-dm-sans)] text-[0.95rem] font-light tracking-[0.15em] uppercase text-[var(--color-ink)]"
+          className="font-[family-name:var(--font-dm-sans)] text-[0.95rem] font-light tracking-[0.15em] uppercase text-[var(--color-ink)] transition-colors duration-600"
         >
           Twenty<span className="font-extralight opacity-50">1</span>Global
         </a>
@@ -61,7 +61,7 @@ export default function NavHeader() {
               key={link.href}
               href={link.href}
               onClick={(e) => handleClick(e, link.href)}
-              className="nav-link font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.2em] uppercase text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors duration-300"
+              className="nav-link font-[family-name:var(--font-dm-sans)] text-[0.7rem] font-medium tracking-[0.2em] uppercase text-[var(--color-ink)]/70 hover:text-[var(--color-ink)] transition-colors duration-300"
             >
               {link.label}
             </a>

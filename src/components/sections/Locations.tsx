@@ -40,24 +40,11 @@ const LOCATIONS = [
   },
 ];
 
-const primaryMarkers: GlobeMarker[] = LOCATIONS.map((loc) => ({
+const markers: GlobeMarker[] = LOCATIONS.map((loc) => ({
   lat: loc.lat,
   lng: loc.lng,
   label: loc.city,
 }));
-
-const secondaryMarkers: GlobeMarker[] = [
-  { lat: 51.5074, lng: -0.1278, label: "London" },
-  { lat: 35.6762, lng: 139.6503, label: "Tokyo" },
-  { lat: 40.7128, lng: -74.006, label: "New York" },
-  { lat: -33.8688, lng: 151.2093, label: "Sydney" },
-  { lat: 55.7558, lng: 37.6173, label: "Moscow" },
-  { lat: -22.9068, lng: -43.1729, label: "Rio de Janeiro" },
-  { lat: 31.2304, lng: 121.4737, label: "Shanghai" },
-  { lat: 28.6139, lng: 77.209, label: "New Delhi" },
-];
-
-const allMarkers = [...primaryMarkers, ...secondaryMarkers];
 
 export default function Locations() {
   const [activeCity, setActiveCity] = useState<string>("Dubai");
@@ -85,10 +72,7 @@ export default function Locations() {
       id="locations"
       className="relative section-padding overflow-hidden flex flex-col"
     >
-      {/* Background numeral */}
-      <div className="absolute bottom-0 right-[5%] md:right-[8%] lg:right-[10%] numeral select-none pointer-events-none z-0">
-        03
-      </div>
+
 
       {/* Section header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
@@ -117,7 +101,7 @@ export default function Locations() {
         {/* Globe — takes primary space */}
         <div className="relative w-full lg:w-[60%] h-[420px] md:h-[520px] -mx-[5%] md:-mx-[8%] lg:-mx-0 lg:ml-[-5%] lg:w-[calc(60%+5%)]">
           <Globe3D
-            markers={allMarkers}
+            markers={markers}
             config={{
               atmosphereColor: "#1b365d",
               atmosphereIntensity: 20,

@@ -86,6 +86,7 @@ export default function DitherShader({
       animOffset.current += animationSpeed;
     }
 
+
     const [pr, pg, pb] = primary.current;
     const [sr, sg, sb] = secondary.current;
 
@@ -150,8 +151,9 @@ export default function DitherShader({
       if (!parent) return;
 
       const rect = parent.getBoundingClientRect();
-      canvas.width = rect.width || 800;
-      canvas.height = rect.height || 600;
+      const scale = 0.5;
+      canvas.width = (rect.width || 800) * scale;
+      canvas.height = (rect.height || 600) * scale;
 
       // Maintain aspect ratio
       const imgRatio = img.naturalWidth / img.naturalHeight;
@@ -163,6 +165,9 @@ export default function DitherShader({
         const newWidth = canvas.height * imgRatio;
         canvas.width = newWidth;
       }
+
+      canvas.style.width = (rect.width || 800) + "px";
+      canvas.style.height = (rect.height || 600) + "px";
 
       render();
     };
