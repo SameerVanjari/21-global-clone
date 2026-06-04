@@ -19,7 +19,6 @@ const LOCATIONS = [
     lng: 55.2708,
     description:
       "The commercial nexus connecting East and West. Our Dubai office anchors all strategic operations, capital allocation, and senior leadership — positioned at the centre of global trade flows.",
-    offset: "",
   },
   {
     city: "Singapore",
@@ -29,7 +28,6 @@ const LOCATIONS = [
     lng: 103.8198,
     description:
       "Our gateway to the fastest-growing markets on earth. Singapore drives our Asian sourcing, distribution, and financial operations with the precision the city-state is renowned for.",
-    offset: "md:mt-20",
   },
   {
     city: "Geneva",
@@ -39,11 +37,10 @@ const LOCATIONS = [
     lng: 6.1432,
     description:
       "The historic heart of global commodity trading. Our Geneva presence ensures access to European markets, trade finance networks, and the rigorous standards Swiss commerce demands.",
-    offset: "md:mt-40",
   },
 ];
 
-const markers: GlobeMarker[] = LOCATIONS.map((loc) => ({
+const primaryMarkers: GlobeMarker[] = LOCATIONS.map((loc) => ({
   lat: loc.lat,
   lng: loc.lng,
   label: loc.city,
@@ -60,27 +57,41 @@ const secondaryMarkers: GlobeMarker[] = [
   { lat: 28.6139, lng: 77.209, label: "New Delhi" },
 ];
 
-const allMarkers = [...markers, ...secondaryMarkers];
+const allMarkers = [...primaryMarkers, ...secondaryMarkers];
 
 export default function Locations() {
   const [activeCity, setActiveCity] = useState<string>("Dubai");
+  const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+
+  const displayedCity = hoveredCity || activeCity;
+  const activeLocation = LOCATIONS.find((l) => l.city === displayedCity) || LOCATIONS[0];
+  const isPrimary = LOCATIONS.some((l) => l.city === displayedCity);
 
   const handleMarkerClick = useCallback((marker: GlobeMarker) => {
     const loc = LOCATIONS.find((l) => l.city === marker.label);
     if (loc) setActiveCity(loc.city);
   }, []);
 
-  const activeLocation = LOCATIONS.find((l) => l.city === activeCity) || LOCATIONS[0];
+  const handleMarkerHover = useCallback((marker: GlobeMarker | null) => {
+    if (marker && LOCATIONS.some((l) => l.city === marker.label)) {
+      setHoveredCity(marker.label);
+    } else {
+      setHoveredCity(null);
+    }
+  }, []);
 
   return (
-    <section id="locations" className="relative section-padding overflow-hidden">
+    <section
+      id="locations"
+      className="relative section-padding overflow-hidden flex flex-col"
+    >
       {/* Background numeral */}
       <div className="absolute bottom-0 right-[5%] md:right-[8%] lg:right-[10%] numeral select-none pointer-events-none z-0">
         03
       </div>
 
       {/* Section header */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
         <div className="lg:col-span-4">
           <ScrollReveal>
             <span className="block text-eyebrow text-[var(--color-gold)] mb-6">
@@ -91,85 +102,100 @@ export default function Locations() {
             </h2>
           </ScrollReveal>
         </div>
-        <div className="lg:col-span-6 lg:col-start-7">
+        <div className="lg:col-span-5 lg:col-start-7">
           <ScrollReveal delay={150}>
             <p className="text-body text-[var(--color-ink-muted)] leading-[1.9]">
-              Three strategic hubs. One seamless operation. Our offices are
-              positioned to provide continuous market coverage across every
-              major time zone. Click a marker to explore.
+              Three strategic hubs. One seamless operation. Hover over any
+              marker on the globe to explore.
             </p>
           </ScrollReveal>
         </div>
       </div>
 
-      {/* Globe — full bleed with overflow hidden */}
-      <div className="relative w-full h-[500px] md:h-[650px] -mx-[5%] md:-mx-[8%] lg:-mx-[10%] w-[calc(100%+10%)] md:w-[calc(100%+16%)] lg:w-[calc(100%+20%)]">
-        <Globe3D
-          markers={allMarkers}
-          config={{
-            atmosphereColor: "#1b365d",
-            atmosphereIntensity: 20,
-            bumpScale: 5,
-            autoRotateSpeed: 0.3,
-          }}
-          onMarkerClick={handleMarkerClick}
-        />
+      {/* Globe + City card in a cohesive viewport-friendly row */}
+      <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12 items-center min-h-0">
+        {/* Globe — takes primary space */}
+        <div className="relative w-full lg:w-[60%] h-[420px] md:h-[520px] -mx-[5%] md:-mx-[8%] lg:-mx-0 lg:ml-[-5%] lg:w-[calc(60%+5%)]">
+          <Globe3D
+            markers={allMarkers}
+            config={{
+              atmosphereColor: "#1b365d",
+              atmosphereIntensity: 20,
+              bumpScale: 5,
+              autoRotateSpeed: 0.3,
+            }}
+            onMarkerClick={handleMarkerClick}
+            onMarkerHover={handleMarkerHover}
+          />
 
-        {/* Gradient masks for soft edge blending */}
-        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[var(--color-cream)] to-transparent pointer-events-none z-10" />
-        <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--color-cream)] to-transparent pointer-events-none z-10" />
-      </div>
+          {/* Gradient masks for soft edge blending */}
+          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[var(--color-cream)] to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-[var(--color-cream)] to-transparent pointer-events-none z-10" />
+        </div>
 
-      {/* Active location preview card */}
-      <div className="relative -mt-6 z-20">
-        <ScrollReveal>
-          <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--color-divider)] px-10 py-6">
-            <div className="flex items-baseline gap-4 mb-2">
-              <h3 className="font-[family-name:var(--font-dm-sans)] text-[2rem] font-extralight tracking-[-0.02em] text-[var(--color-ink)] leading-none">
-                {activeLocation.city}
-              </h3>
-              <span className="text-caption text-[var(--color-gold)]">
-                {activeLocation.role}
-              </span>
-            </div>
-            <p className="font-[family-name:var(--font-lora)] text-[0.9rem] leading-[1.8] text-[var(--color-ink-muted)]">
-              {activeLocation.description}
-            </p>
-          </div>
-        </ScrollReveal>
-      </div>
-
-      {/* City cards */}
-      <div className="rule mb-12 mt-12" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-        {LOCATIONS.map((loc, i) => (
-          <ScrollReveal key={loc.city} delay={i * 150}>
+        {/* Single reactive city card */}
+        <div className="w-full lg:w-[40%] lg:pr-[2%] z-20">
+          <ScrollReveal key={displayedCity}>
             <div
-              onClick={() => setActiveCity(loc.city)}
-              className={`group p-8 md:p-10 border border-transparent cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] border-[var(--color-divider)] ${
-                i < LOCATIONS.length - 1 ? "border-r-0 md:border-r" : ""
-              } ${loc.offset} ${
-                activeCity === loc.city
-                  ? "bg-[var(--color-gold-pale)]/30"
-                  : "hover:bg-[var(--color-gold-pale)]/15"
+              className={`relative border-l-2 p-6 md:p-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isPrimary
+                  ? "border-[var(--color-gold)] bg-[var(--color-gold-pale)]/20"
+                  : "border-[var(--color-divider)]"
               }`}
             >
-              <h3 className="font-[family-name:var(--font-dm-sans)] text-[clamp(2.5rem,4vw,3.5rem)] font-extralight tracking-[-0.02em] text-[var(--color-ink)] mb-2 leading-none">
-                {loc.city}
+              {/* City label row */}
+              <div className="flex items-baseline gap-3 mb-1">
+                <span className="font-[family-name:var(--font-dm-sans)] text-[0.6rem] font-medium tracking-[0.3em] uppercase text-[var(--color-gold)]">
+                  {isPrimary ? "Office" : "Partner"}
+                </span>
+                {!isPrimary && (
+                  <span className="text-caption text-[var(--color-ink-muted)]/40">
+                    (click a primary marker to set focus)
+                  </span>
+                )}
+              </div>
+
+              <h3 className="font-[family-name:var(--font-dm-sans)] text-[clamp(2.2rem,3.5vw,3.5rem)] font-extralight tracking-[-0.02em] text-[var(--color-ink)] mb-3 leading-none">
+                {activeLocation.city}
               </h3>
-              <p className="text-caption text-[var(--color-ink-muted)] mb-1">
-                {loc.role}
+
+              {isPrimary && (
+                <p className="text-caption text-[var(--color-ink-muted)] mb-4">
+                  {activeLocation.role} &middot; {activeLocation.region}
+                </p>
+              )}
+              {!isPrimary && (
+                <p className="text-caption text-[var(--color-ink-muted)]/60 mb-4">
+                  Hover over {activeLocation.city} for trade routes
+                </p>
+              )}
+
+              <div className="rule-short mb-4" />
+
+              <p className="font-[family-name:var(--font-lora)] text-[0.95rem] leading-[1.8] text-[var(--color-ink-muted)]">
+                {isPrimary
+                  ? activeLocation.description
+                  : `${activeLocation.city} is a key node in our global trading network — connected to our hubs through established trade corridors and strategic partnerships.`}
               </p>
-              <p className="text-caption text-[var(--color-ink-muted)]/60 mb-6">
-                {loc.region}
-              </p>
-              <div className="rule-short mb-6" />
-              <p className="font-[family-name:var(--font-lora)] text-[0.9rem] leading-[1.8] text-[var(--color-ink-muted)]">
-                {loc.description}
-              </p>
+
+              {/* Dot indicators for primary cities */}
+              <div className="flex gap-3 mt-6">
+                {LOCATIONS.map((loc) => (
+                  <button
+                    key={loc.city}
+                    onClick={() => setActiveCity(loc.city)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      activeCity === loc.city && !hoveredCity
+                        ? "bg-[var(--color-gold)] scale-125"
+                        : "bg-[var(--color-ink)]/15 hover:bg-[var(--color-gold)]/40"
+                    }`}
+                    aria-label={loc.city}
+                  />
+                ))}
+              </div>
             </div>
           </ScrollReveal>
-        ))}
+        </div>
       </div>
     </section>
   );
